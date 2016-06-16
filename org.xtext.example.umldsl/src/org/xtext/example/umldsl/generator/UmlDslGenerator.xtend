@@ -13,12 +13,109 @@ import org.eclipse.xtext.generator.IFileSystemAccess
  * See https://www.eclipse.org/Xtext/documentation/303_runtime_concepts.html#code-generation
  */
 class UmlDslGenerator implements IGenerator {
-	
+
 	override void doGenerate(Resource resource, IFileSystemAccess fsa) {
 //		fsa.generateFile('greetings.txt', 'People to greet: ' + 
 //			resource.allContents
 //				.filter(typeof(Greeting))
 //				.map[name]
 //				.join(', '))
+//		for (e : resource.allContents.toIterable.filter(typeof(Class))) {
+//			fsa.generateFile("uml-gen/" + e.name + ".java", e.compile)
+//		}
+
+		genMainApp();
+		
+
+
 	}
+	
+	
+	def genMainApp(){
+		'''
+		import javax.swing.JFrame;
+		import javax.swing.event.DocumentListener;
+		import javax.swing.event.DocumentEvent;
+		import javax.swing.JTextField;
+		import java.awt.GridLayout;
+		import javax.swing.JLabel;
+		import javax.swing.SwingUtilities;
+		
+		public class FormularGenerator extends JFrame {
+		
+		  private DocumentListener listener = new DocumentListener() {
+		    public void insertUpdate(DocumentEvent p0) {
+		      update();
+		    }
+		    public void removeUpdate(DocumentEvent p0) {
+		      update();
+		    }
+		    public void changedUpdate(DocumentEvent p0) {
+		      update();
+		    }
+		  };
+		
+		«genTextArea()»
+	
+		
+		  public FormularGenerator() {
+		    setTitle("A formular");
+		    setLayout(new GridLayout(0, 2));
+		    inputField_a_0.getDocument().addDocumentListener(listener);
+		    add(new JLabel("inputFeld nr1"));
+		    add(inputField_a_0);
+		    inputField_b_0.getDocument().addDocumentListener(listener);
+		    add(new JLabel("inputFeld nr2"));
+		    add(inputField_b_0);
+		    add(new JLabel("Output"));
+		    add(outputField_a_0);
+		    update();
+		    setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		    pack();
+		    setVisible(true);
+		  }
+		
+		  public void update() {
+			«genUpdate()»
+		  }
+		
+		  public static void main(String[] args) {
+		    SwingUtilities.invokeLater(new Runnable() {
+		      public void run() {
+		        new FormularGenerator();
+		      }
+		    });
+		  }
+		
+		'''
+		
+	}
+	
+	def genTextArea(){
+		'''
+			
+				  private JTextField inputField_a_0 = new JTextField();
+				  private JTextField inputField_b_0 = new JTextField();
+				  private JTextField outputField_a_0 = new JTextField();
+				  
+				  
+		'''
+	}
+	
+	def genUpdate(){
+		'''
+		
+		'''
+	
+	}
+//	def compile(Class c) {
+//		'''
+//			package umldsl;
+//			
+//			public class «c.name»{
+//			
+//			}
+//		'''
+//
+//	}
 }

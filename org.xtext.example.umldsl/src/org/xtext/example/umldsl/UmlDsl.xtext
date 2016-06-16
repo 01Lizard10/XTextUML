@@ -11,9 +11,44 @@ Model:
 ;
  
 Element:
-    "element" name=ID "mapsTo" ref=[uml::Class|FQN]
+    Class | Property | Association | Formular
 ;
  
+Class:
+	"class" name=ID "mapsTo" ref=[uml::Class|FQN]
+; 
 FQN returns ecore::EString:
     ID ("." ID)*
+;
+// Neu:
+Property:
+	"property" name=ID "mapsTo" ref=[uml::Property|FQN]
+;
+
+Association:
+	"association" name=ID "mapsTo" ref=[uml::Association|FQN]
+;
+
+// Forumlar-Creator:
+
+Formular:
+	"form"	name=ID '{'
+	formelement += Formelement*
+	'}'
+;
+
+Formelement:
+	TextArea | Label | LineBreak
+;
+
+TextArea:
+	"textarea" value=[Property]
+;
+
+Label:
+	"label" value=[Property]
+;
+
+LineBreak:
+	"lb"
 ;
