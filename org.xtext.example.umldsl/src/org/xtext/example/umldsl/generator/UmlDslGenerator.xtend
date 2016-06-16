@@ -7,6 +7,7 @@ import org.eclipse.emf.ecore.resource.Resource
 import org.eclipse.xtext.generator.IGenerator
 import org.eclipse.xtext.generator.IFileSystemAccess
 import java.util.ArrayList
+import org.xtext.example.umldsl.umlDsl.Rule
 
 /**
  * Generates code from your model files on save.
@@ -30,106 +31,82 @@ class UmlDslGenerator implements IGenerator {
 			propList.add(prop)
 		}
 
-		fsa.generateFile("uml-gen/" + "FormularGenerator" + ".java", genMainApp(propList))
+		val ruleList = newArrayList()
+		for(rule : resource.allContents.toIterable.filter(typeof(Rule))) {
+			ruleList.add(rule)
+		}
 
+		fsa.generateFile("umlgen/" + "FormularGenerator" + ".java", genMainApp(propList, ruleList))
 	}
 
-	def genMainApp(ArrayList<org.xtext.example.umldsl.umlDsl.Property> propList) {
+	def genMainApp(ArrayList<org.xtext.example.umldsl.umlDsl.Property> propList,ArrayList<Rule> ruleList) {
 		'''		
-				default package
-				import javax.swing.JFrame;
-				import javax.swing.event.DocumentListener;
-				import javax.swing.event.DocumentEvent;
-				import javax.swing.JTextField;
-				import java.awt.GridLayout;
-				import javax.swing.JLabel;
-				import javax.swing.SwingUtilities;
-				
-				public class FormularGenerator extends JFrame {
-				
-			  private DocumentListener listener = new DocumentListener() {
-			    public void insertUpdate(DocumentEvent p0) {
-			      update();
-			    }
-			    public void removeUpdate(DocumentEvent p0) {
-			      update();
-			    }
-			    public void changedUpdate(DocumentEvent p0) {
-			      update();
-			    }
-			  };
-				
-				«genTextArea(propList)»
+			package umlgen;
+			import javax.swing.JFrame;
+			import javax.swing.event.DocumentListener;
+			import javax.swing.event.DocumentEvent;
+			import javax.swing.JTextField;
+			import java.awt.GridLayout;
+			import javax.swing.JLabel;
+			import javax.swing.SwingUtilities;
 			
+			public class FormularGenerator extends JFrame {
+			
+			private DocumentListener listener = new DocumentListener() {
+				public void insertUpdate(DocumentEvent p0) {
+				  update();
+				}
+				public void removeUpdate(DocumentEvent p0) {
+				  update();
+				}
+				public void changedUpdate(DocumentEvent p0) {
+				  update();
+				}
+			};
+			
+			private JLabel errorLabel = new JLabel("ERROR -> Constraint failes");
+			«FOR prop : propList»
+			private JTextField ta_«prop.name» = new JTextField();
+			«ENDFOR»
+			
+			
+			  public FormularGenerator() {
+			    setTitle("A formular");
+			    setLayout(new GridLayout(0, 2));
+			    			    
+	    	«FOR prop : propList»
+			ta_«prop.name».getDocument().addDocumentListener(listener);
+	   		«ENDFOR»
+			
+		    «FOR prop : propList»
+		    add(new JLabel("«prop.name»: "));
+		    add(ta_«prop.name»);
+			«ENDFOR»
 				
-				  public FormularGenerator() {
-				    setTitle("A formular");
-				    setLayout(new GridLayout(0, 2));
-				    inputField_a_0.getDocument().addDocumentListener(listener);
-				    add(new JLabel("inputFeld nr1"));
-				    add(inputField_a_0);
-				    inputField_b_0.getDocument().addDocumentListener(listener);
-				    add(new JLabel("inputFeld nr2"));
-				    add(inputField_b_0);
-				    add(new JLabel("Output"));
-				    add(outputField_a_0);
-				    update();
-				    setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-				    pack();
-				    setVisible(true);
-				  }
-				
-				  public void update() {
-					«genUpdate()»
-					 }
-				
-				  public static void main(String[] args) {
-				    SwingUtilities.invokeLater(new Runnable() {
-				      public void run() {
-				        new FormularGenerator();
-				      }
-				    });
-				  }
-				
+			    add(errorLabel);
+			    update();
+			    setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+			    pack();
+			    setVisible(true);
+			  }
+			
+			  public void update() {
+				 errorLabel.setText(errorLabel.getText() + "E");
+ 		    «FOR rule : ruleList»
+ 		    errorLabel.setText(errorLabel.getText() + «rule»);
+ 		    errorLabel.setText(errorLabel.getText() + «rule.elements»);
+ 			«ENDFOR»
+				 
+				 }
+			
+			  public static void main(String[] args) {
+			    SwingUtilities.invokeLater(new Runnable() {
+			      public void run() {
+			        new FormularGenerator();
+			      }
+			    });
+			  }
+			}
 			'''
-
 	}
-
-	def genTextArea(ArrayList<org.xtext.example.umldsl.umlDsl.Property> propList) {
-		'''
-	
-		
-		
-					
-				  private JTextField inputField_a_0 = new JTextField();
-				  private JTextField inputField_b_0 = new JTextField();
-				  private JTextField outputField_a_0 = new JTextField();
-				  
-«««				  «	for(var i = 0;i < propList.size;i++){
-«««					print(propList.get(i).name)
-«««					}»
-						  
-				«FOR prop : propList»
-				private JTextField «prop.name» = new JTextField();
-				«ENDFOR»	  
-						  
-			'''
-	}
-
-	def genUpdate() {
-		'''
-		
-		'''
-
-	}
-//	def compile(Class c) {
-//		'''
-//			package umldsl;
-//			
-//			public class «c.name»{
-//			
-//			}
-//		'''
-//
-//	}
 }
