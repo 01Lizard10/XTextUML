@@ -6,6 +6,7 @@ package org.xtext.example.umldsl.generator
 import org.eclipse.emf.ecore.resource.Resource
 import org.eclipse.xtext.generator.IGenerator
 import org.eclipse.xtext.generator.IFileSystemAccess
+import java.util.ArrayList
 
 /**
  * Generates code from your model files on save.
@@ -24,89 +25,102 @@ class UmlDslGenerator implements IGenerator {
 //			fsa.generateFile("uml-gen/" + e.name + ".java", e.compile)
 //		}
 
-		genMainApp();
-		
+		val propList = newArrayList()
+		for(prop : resource.allContents.toIterable.filter(typeof(org.xtext.example.umldsl.umlDsl.Property))) {
+			propList.add(prop)
+		}
 
+		fsa.generateFile("uml-gen/" + "FormularGenerator" + ".java", genMainApp(propList))
 
 	}
-	
-	
-	def genMainApp(){
-		'''
-		import javax.swing.JFrame;
-		import javax.swing.event.DocumentListener;
-		import javax.swing.event.DocumentEvent;
-		import javax.swing.JTextField;
-		import java.awt.GridLayout;
-		import javax.swing.JLabel;
-		import javax.swing.SwingUtilities;
-		
-		public class FormularGenerator extends JFrame {
-		
-		  private DocumentListener listener = new DocumentListener() {
-		    public void insertUpdate(DocumentEvent p0) {
-		      update();
-		    }
-		    public void removeUpdate(DocumentEvent p0) {
-		      update();
-		    }
-		    public void changedUpdate(DocumentEvent p0) {
-		      update();
-		    }
-		  };
-		
-		«genTextArea()»
-	
-		
-		  public FormularGenerator() {
-		    setTitle("A formular");
-		    setLayout(new GridLayout(0, 2));
-		    inputField_a_0.getDocument().addDocumentListener(listener);
-		    add(new JLabel("inputFeld nr1"));
-		    add(inputField_a_0);
-		    inputField_b_0.getDocument().addDocumentListener(listener);
-		    add(new JLabel("inputFeld nr2"));
-		    add(inputField_b_0);
-		    add(new JLabel("Output"));
-		    add(outputField_a_0);
-		    update();
-		    setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		    pack();
-		    setVisible(true);
-		  }
-		
-		  public void update() {
-			«genUpdate()»
-		  }
-		
-		  public static void main(String[] args) {
-		    SwingUtilities.invokeLater(new Runnable() {
-		      public void run() {
-		        new FormularGenerator();
-		      }
-		    });
-		  }
-		
-		'''
-		
-	}
-	
-	def genTextArea(){
-		'''
+
+	def genMainApp(ArrayList<org.xtext.example.umldsl.umlDsl.Property> propList) {
+		'''		
+				default package
+				import javax.swing.JFrame;
+				import javax.swing.event.DocumentListener;
+				import javax.swing.event.DocumentEvent;
+				import javax.swing.JTextField;
+				import java.awt.GridLayout;
+				import javax.swing.JLabel;
+				import javax.swing.SwingUtilities;
+				
+				public class FormularGenerator extends JFrame {
+				
+			  private DocumentListener listener = new DocumentListener() {
+			    public void insertUpdate(DocumentEvent p0) {
+			      update();
+			    }
+			    public void removeUpdate(DocumentEvent p0) {
+			      update();
+			    }
+			    public void changedUpdate(DocumentEvent p0) {
+			      update();
+			    }
+			  };
+				
+				«genTextArea(propList)»
 			
+				
+				  public FormularGenerator() {
+				    setTitle("A formular");
+				    setLayout(new GridLayout(0, 2));
+				    inputField_a_0.getDocument().addDocumentListener(listener);
+				    add(new JLabel("inputFeld nr1"));
+				    add(inputField_a_0);
+				    inputField_b_0.getDocument().addDocumentListener(listener);
+				    add(new JLabel("inputFeld nr2"));
+				    add(inputField_b_0);
+				    add(new JLabel("Output"));
+				    add(outputField_a_0);
+				    update();
+				    setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+				    pack();
+				    setVisible(true);
+				  }
+				
+				  public void update() {
+					«genUpdate()»
+					 }
+				
+				  public static void main(String[] args) {
+				    SwingUtilities.invokeLater(new Runnable() {
+				      public void run() {
+				        new FormularGenerator();
+				      }
+				    });
+				  }
+				
+			'''
+
+	}
+
+	def genTextArea(ArrayList<org.xtext.example.umldsl.umlDsl.Property> propList) {
+		'''
+	
+		
+		
+					
 				  private JTextField inputField_a_0 = new JTextField();
 				  private JTextField inputField_b_0 = new JTextField();
 				  private JTextField outputField_a_0 = new JTextField();
 				  
-				  
-		'''
+«««				  «	for(var i = 0;i < propList.size;i++){
+«««					print(propList.get(i).name)
+«««					}»
+						  
+				«FOR prop : propList»
+				private JTextField «prop.name» = new JTextField();
+				«ENDFOR»	  
+						  
+			'''
 	}
-	
-	def genUpdate(){
+
+	def genUpdate() {
 		'''
 		
 		'''
-	
+
 	}
 //	def compile(Class c) {
 //		'''

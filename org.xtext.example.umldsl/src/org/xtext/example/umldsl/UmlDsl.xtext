@@ -11,7 +11,7 @@ Model:
 ;
  
 Element:
-    Class | Property | Association | Formular
+    Class | Property | Association | Rule | Formular
 ;
  
 Class:
@@ -28,6 +28,24 @@ Property:
 Association:
 	"association" name=ID "mapsTo" ref=[uml::Association|FQN]
 ;
+
+// Constraint:
+Rule:
+	"rule" name=ID '{'
+	elements += AbstractElement*
+	'}'
+;
+
+AbstractElement:
+	Variable | Expression 
+;
+
+Variable:
+	name=ID '=' expression=Expression
+;
+Expression:
+	value=INT
+	;
 
 // Forumlar-Creator:
 
