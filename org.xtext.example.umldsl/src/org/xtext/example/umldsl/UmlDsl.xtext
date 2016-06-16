@@ -29,7 +29,7 @@ Association:
 	"association" name=ID "mapsTo" ref=[uml::Association|FQN]
 ;
 
-// Constraint:
+// Constraint:-----------------------------------------------------------
 Rule:
 	"rule" name=ID '{'
 	elements += AbstractElement*
@@ -44,10 +44,29 @@ Variable:
 	name=ID '=' expression=Expression
 ;
 Expression:
-	value=INT
+	PlusOrMinus
+;
+PlusOrMinus returns Expression:
+	MulOrDiv (
+		({Plus.left=current} '+' | {Minus.left=current} '-')
+		right=MulOrDiv
+	)*
+;
+MulOrDiv returns Expression:
+	Atomic(
+		({MulOrDiv.left=current} op=('*'|'/'))
+		right=Atomic
+	)*
+;
+Atomic returns Expression:
+	'(' Expression ')'|
+	{IntConstant} value=INT |
+	{StringConstant} value=STRING |
+	{BoolConstant} value=('true'|'false')|
+	{VariableRef} variable=[Variable]
 	;
 
-// Forumlar-Creator:
+// Forumlar-Creator: ----------------------------------------------------
 
 Formular:
 	"form"	name=ID '{'
