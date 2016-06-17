@@ -7,7 +7,8 @@ import org.eclipse.emf.ecore.resource.Resource
 import org.eclipse.xtext.generator.IGenerator
 import org.eclipse.xtext.generator.IFileSystemAccess
 import java.util.ArrayList
-import org.xtext.example.umldsl.umlDsl.Rule
+import org.xtext.example.umldsl.umlDsl.PropertyEqualityConstraint
+import org.xtext.example.umldsl.umlDsl.NumberRestrictionConstraint
 
 /**
  * Generates code from your model files on save.
@@ -31,22 +32,40 @@ class UmlDslGenerator implements IGenerator {
 			propList.add(prop)
 		}
 
-		val ruleList = newArrayList()
-		for(rule : resource.allContents.toIterable.filter(typeof(Rule))) {
-			ruleList.add(rule)
+//		val ruleList = newArrayList()
+//		for(rule : resource.allContents.toIterable.filter(typeof(Rule))) {
+//			ruleList.add(rule)
+//		}
+		val propertyEqualityConstraintList = newArrayList()
+		for(x : resource.allContents.toIterable.filter(typeof(org.xtext.example.umldsl.umlDsl.PropertyEqualityConstraint))) {
+			propertyEqualityConstraintList.add(x)
+		}
+		val numberRestrictionConstraint = newArrayList()
+		for(x : resource.allContents.toIterable.filter(typeof(org.xtext.example.umldsl.umlDsl.NumberRestrictionConstraint))) {
+			numberRestrictionConstraint.add(x)
 		}
 
-		fsa.generateFile("umlgen/" + "FormularGenerator" + ".java", genMainApp(propList, ruleList))
+		fsa.generateFile("umlgen/" + "FormularGenerator" + ".java", genMainApp(
+			propList,
+			propertyEqualityConstraintList,
+			numberRestrictionConstraint
+			
+		))
 	}
 
-	def genMainApp(ArrayList<org.xtext.example.umldsl.umlDsl.Property> propList,ArrayList<Rule> ruleList) {
+	def genMainApp(ArrayList<org.xtext.example.umldsl.umlDsl.Property> propList,
+		ArrayList<PropertyEqualityConstraint> propertyEqualityConstraintList,
+		ArrayList<NumberRestrictionConstraint> numberRestrictionConstraint
+	) {
 		'''		
 			package umlgen;
 			import javax.swing.JFrame;
 			import javax.swing.event.DocumentListener;
 			import javax.swing.event.DocumentEvent;
-			import javax.swing.JTextField;
-			import java.awt.GridLayout;
+			import javax.swing.JTextField;			
+			import java.awt.Color;
+			import java.awt.GridLayout;			
+			import javax.swing.BorderFactory;
 			import javax.swing.JLabel;
 			import javax.swing.SwingUtilities;
 			
@@ -64,7 +83,8 @@ class UmlDslGenerator implements IGenerator {
 				}
 			};
 			
-			private JLabel errorLabel = new JLabel("ERROR -> Constraint failes");
+			private JLabel errorLabel = new JLabel("This is a Label");
+			private JLabel errorLabel2 = new JLabel("This is also a Label");
 			«FOR prop : propList»
 			private JTextField ta_«prop.name» = new JTextField();
 			«ENDFOR»
@@ -81,61 +101,51 @@ class UmlDslGenerator implements IGenerator {
 		    «FOR prop : propList»
 		    add(new JLabel("«prop.name»: "));
 		    add(ta_«prop.name»);
+		    //«prop.ref.^default»
+		    ta_«prop.name».setText("«prop.ref.^default»");
 			«ENDFOR»
 				
 			    add(errorLabel);
+			    add(errorLabel2);
+			    errorLabel.setBorder(BorderFactory.createLineBorder(Color.black));
+			    errorLabel2.setBorder(BorderFactory.createLineBorder(Color.black));
 			    update();
 			    setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 			    pack();
 			    setVisible(true);
 			  }
-			
+			// -----------------------------------------------------------------------
 			  public void update() {
 				 //errorLabel.setText(errorLabel.getText() + "E");
- 		    «FOR rule : ruleList»
-««« 		    errorLabel.setText(errorLabel.getText() + "«rule»");
-««« 		    errorLabel.setText(errorLabel.getText() + "«rule.elements»");
-««« 		    errorLabel.setText(errorLabel.getText() + "«rule.name»");
-««« 		
-
-		
-			    
- 		    «IF rule.rule.equality.equals("!=")»
- 		    if(ta_«rule.rule.leftSite».getText().equals(ta_«rule.rule.rightSite».getText())){
- 		    	  	errorLabel.setText(errorLabel.getText() + "Error: Rule1 is broken");
- 		    	 		    	} else{
- 		    	 		    		errorLabel.setText("");
- 		    	 		    		}
- 		    	«ENDIF»
- 		    «IF rule.rule.equality.equals("==")»
- 		    if(!(ta_«rule.rule.leftSite».getText().equals(ta_«rule.rule.rightSite».getText()))){
- 		    	  	errorLabel.setText(errorLabel.getText() + "Error: Rule1 is broken");
- 		    	 		    	} else{
- 		    	 		    		errorLabel.setText("");
- 		    	 		    		}
- 		    	«ENDIF»
- 		  
- 		  
- 		  //«rule»
- 		  //«rule.name»
- 		  //«rule.rule»
- 		  //«rule.rule.leftSite.eClass»
-			// «rule.rule.leftSite.eClass.name»
-			// «rule.rule.leftSite.eClass.name == "PropertyRef"»
-			// «rule.rule.leftSite.eClass.eResource»
-			// «rule.rule.leftSite.eResource»
-			// «rule.rule.leftSite.toString»
-			// «rule.rule.leftSite.eContainer»
-			// «rule.rule.leftSite.eClass.toString»
-			//«rule.rule.eClass»
-			//«rule.rule.eClass.name»
-			//«rule.rule.eClass.name == "PropertyEquilityConstraint"»
- 		    		
- 		    		
- 		    «IF rule.rule.eClass != null && rule.rule.eClass.name.equals("PropertyEquilityConstraint")»	
- 		    // Geht!	    
- 		    «ENDIF»
+				  
+ 		    «FOR rule : propertyEqualityConstraintList» 
+ 		    
+ 		    «IF rule.equality.equals("!=")»
+				if(ta_«rule.leftSite.name».getText().equals(ta_«rule.rightSite.name».getText())){
+				  	errorLabel.setText("Error: Rule broken: «rule.leftSite.name» «rule.equality» «rule.rightSite.name»");
+				 		    	} else{
+				 		    		errorLabel.setText("");
+				 		    		}
+				«ENDIF»
+				«IF rule.equality.equals("==")»
+				if(!(ta_«rule.leftSite.name».getText().equals(ta_«rule.rightSite.name».getText()))){
+				  	errorLabel.setText("Error: Rule broken: «rule.leftSite.name» «rule.equality» «rule.rightSite.name»");
+				 		    	} else{
+				 		    		errorLabel.setText("");
+				 		    		}
+				«ENDIF»
  			«ENDFOR»
+			«FOR rule : numberRestrictionConstraint»
+			try{
+				if(!(Integer.valueOf(ta_«rule.leftSite.name».getText()) «rule.equality»(«rule.rightSite»))){
+						errorLabel2.setText("Error: Rule broken: «rule.leftSite.name» «rule.equality» «rule.rightSite»");
+					}else{
+							errorLabel2.setText("");
+						}
+					}catch(Exception e){
+						errorLabel2.setText("Invalid value for the field: «rule.leftSite.name»; -> «rule.rightSite.class» expected");
+					}
+			«ENDFOR»
 				 
 				 }
 			

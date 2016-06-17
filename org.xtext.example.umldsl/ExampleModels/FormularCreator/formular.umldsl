@@ -1,0 +1,21 @@
+class A mapsTo Model.Formularelement
+property Name mapsTo Model.TextArea_Name.text
+property Password mapsTo Model.TextArea_Password.text
+property Age mapsTo Model.TextArea_Age.text
+ 
+// without Expressions: 
+PropertyEqualityConstraint: Name "!=" Password
+NumberRestrictionConstraint: Age ">" 18
+// Default values vom UML werden auch genutzt.
+ 
+  
+
+// Mit Expressions sollte es so aussehen:  
+//rule Rule1 {
+//	 Name "!=" Password
+//}	
+//  
+//rule Rule2 {
+//	 Alter ">" 18
+//}       
+  

@@ -11,7 +11,7 @@ Model:
 ;
  
 Element:
-    Class | Property | Association | Rule //| Formular
+    Class | Property | Association | PropertyEqualityConstraint | NumberRestrictionConstraint  //| Formular
 ;
  
 Class:
@@ -30,27 +30,37 @@ Association:
 ;
 
 // Constraint:-----------------------------------------------------------
+
+PropertyEqualityConstraint:
+	"PropertyEqualityConstraint:" leftSite=[Property] (equality=STRING)? rightSite=[Property]
+;
+
+NumberRestrictionConstraint:
+	"NumberRestrictionConstraint:" leftSite=[Property] (equality=STRING)? rightSite=INT
+;
+
 //Rule :
 //	"rule" name=ID '{'
 //	elements += AbstractElement*
 //	'}'
 //;
 
-Rule :
-	"rule" name=ID '{'
-	    rule=Constraint
-	'}'	
-;
-Constraint:
-	leftSite=Multi (equality=STRING)? rightSite=Multi
-;
+//Rule :
+//	"rule" name=ID '{'
+//	    rule=Constraint
+//	'}'	
+//;
 
-Multi:
-	{StringConstant} value=STRING|
-	{IntConstant} value=INT|
-	{PropertyRef} prop=[Property]
-//	{ClassRef} class=[Class]
-;
+//Constraint:
+//	leftSite=Multi (equality=STRING)? rightSite=Multi
+//;
+
+//Multi:
+//	{StringConstant} value=STRING|
+//	{IntConstant} value=INT|
+//	{PropertyRef} prop=[Property]
+////	{ClassRef} class=[Class]
+//;
 
 // Expression-stuff:
 AbstractElement:
