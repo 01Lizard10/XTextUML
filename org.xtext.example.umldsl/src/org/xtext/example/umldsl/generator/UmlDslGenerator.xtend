@@ -91,10 +91,50 @@ class UmlDslGenerator implements IGenerator {
 			  }
 			
 			  public void update() {
-				 errorLabel.setText(errorLabel.getText() + "E");
+				 //errorLabel.setText(errorLabel.getText() + "E");
  		    «FOR rule : ruleList»
- 		    errorLabel.setText(errorLabel.getText() + «rule»);
- 		    errorLabel.setText(errorLabel.getText() + «rule.elements»);
+««« 		    errorLabel.setText(errorLabel.getText() + "«rule»");
+««« 		    errorLabel.setText(errorLabel.getText() + "«rule.elements»");
+««« 		    errorLabel.setText(errorLabel.getText() + "«rule.name»");
+««« 		
+
+		
+			    
+ 		    «IF rule.rule.equality.equals("!=")»
+ 		    if(ta_«rule.rule.leftSite».getText().equals(ta_«rule.rule.rightSite».getText())){
+ 		    	  	errorLabel.setText(errorLabel.getText() + "Error: Rule1 is broken");
+ 		    	 		    	} else{
+ 		    	 		    		errorLabel.setText("");
+ 		    	 		    		}
+ 		    	«ENDIF»
+ 		    «IF rule.rule.equality.equals("==")»
+ 		    if(!(ta_«rule.rule.leftSite».getText().equals(ta_«rule.rule.rightSite».getText()))){
+ 		    	  	errorLabel.setText(errorLabel.getText() + "Error: Rule1 is broken");
+ 		    	 		    	} else{
+ 		    	 		    		errorLabel.setText("");
+ 		    	 		    		}
+ 		    	«ENDIF»
+ 		  
+ 		  
+ 		  //«rule»
+ 		  //«rule.name»
+ 		  //«rule.rule»
+ 		  //«rule.rule.leftSite.eClass»
+			// «rule.rule.leftSite.eClass.name»
+			// «rule.rule.leftSite.eClass.name == "PropertyRef"»
+			// «rule.rule.leftSite.eClass.eResource»
+			// «rule.rule.leftSite.eResource»
+			// «rule.rule.leftSite.toString»
+			// «rule.rule.leftSite.eContainer»
+			// «rule.rule.leftSite.eClass.toString»
+			//«rule.rule.eClass»
+			//«rule.rule.eClass.name»
+			//«rule.rule.eClass.name == "PropertyEquilityConstraint"»
+ 		    		
+ 		    		
+ 		    «IF rule.rule.eClass != null && rule.rule.eClass.name.equals("PropertyEquilityConstraint")»	
+ 		    // Geht!	    
+ 		    «ENDIF»
  			«ENDFOR»
 				 
 				 }

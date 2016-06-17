@@ -11,7 +11,7 @@ Model:
 ;
  
 Element:
-    Class | Property | Association | Rule | Formular
+    Class | Property | Association | Rule //| Formular
 ;
  
 Class:
@@ -30,12 +30,29 @@ Association:
 ;
 
 // Constraint:-----------------------------------------------------------
-Rule:
+//Rule :
+//	"rule" name=ID '{'
+//	elements += AbstractElement*
+//	'}'
+//;
+
+Rule :
 	"rule" name=ID '{'
-	elements += AbstractElement*
-	'}'
+	    rule=Constraint
+	'}'	
+;
+Constraint:
+	leftSite=Multi (equality=STRING)? rightSite=Multi
 ;
 
+Multi:
+	{StringConstant} value=STRING|
+	{IntConstant} value=INT|
+	{PropertyRef} prop=[Property]
+//	{ClassRef} class=[Class]
+;
+
+// Expression-stuff:
 AbstractElement:
 	Variable | Expression 
 ;
@@ -43,15 +60,17 @@ AbstractElement:
 Variable:
 	name=ID '=' expression=Expression
 ;
-Expression:
-	Or
-;
+
+Expression:Or;
+
 Or returns Expression:
 	And ({Or.left=current} "||" right=And)*
 ;
+
 And returns Expression:
 	Equality ({And.left=current} "&&" right=Equality)*
 ;
+
 Equality returns Expression:
 	Comparison(
 		{Equality.left=current} op=("==" | "!=")
@@ -90,24 +109,24 @@ Atomic returns Expression:
 
 // Forumlar-Creator: ----------------------------------------------------
 
-Formular:
-	"form"	name=ID '{'
-	formelement += Formelement*
-	'}'
-;
-
-Formelement:
-	TextArea | Label | LineBreak
-;
-
-TextArea:
-	"textarea" value=[Property]
-;
-
-Label:
-	"label" value=[Property]
-;
-
-LineBreak:
-	"lb"
-;
+//Formular:
+//	"form"	name=ID '{'
+//	formelement += Formelement*
+//	'}'
+//;
+//
+//Formelement:
+//	TextArea | Label | LineBreak
+//;
+//
+//TextArea:
+//	"textarea" value=[Property]
+//;
+//
+//Label:
+//	"label" value=[Property]
+//;
+//
+//LineBreak:
+//	"lb"
+//;
