@@ -20,6 +20,7 @@ Class:
 FQN returns ecore::EString:
     ID ("." ID)*
 ;
+
 // UML-Mapping: --------------------------------------------------------
 Property:
 	"property" name=ID "mapsTo" ref=[uml::Property|FQN]
@@ -30,7 +31,6 @@ Association:
 ;
 
 // Constraint:-----------------------------------------------------------
-
 PropertyEqualityConstraint:
 	"PropertyEqualityConstraint:" leftSite=[Property] (equality=STRING)? rightSite=[Property]
 ;
@@ -38,6 +38,10 @@ PropertyEqualityConstraint:
 NumberRestrictionConstraint:
 	"NumberRestrictionConstraint:" leftSite=[Property] (equality=STRING)? rightSite=INT
 ;
+
+
+
+
 
 //Rule :
 //	"rule" name=ID '{'
